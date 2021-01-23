@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -22,6 +24,7 @@ public class Player extends JFrame{
     private int turnsMade;
     private int myPoints;
     private int enemyPoints;
+    private boolean buttonsEnabled;
     private ClientSideConnection csc;
 
     public Player(int w, int h) {
@@ -57,15 +60,50 @@ public class Player extends JFrame{
         if(playerID == 1) {
             message.setText("You are player #1. You go first");
             otherPlayerID = 2;
+            buttonsEnabled = true;
         } else {
             message.setText("You are player #2. Wait your turn");
             otherPlayerID = 1;
+            buttonsEnabled = false;
         }
+
+        toggleButtons();
         this.setVisible(true);
     }
 
     public void connectToServer() {
         csc = new ClientSideConnection();
+    }
+
+    public void setUpButtons() {
+        ActionListener al = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                JButton b = (JButton) ae.getSource();
+                int bNum = Integer.parseInt(b.getText());
+                message.setText("You clicked button number: " + bNum + ". Now wait for next player");
+                turnsMade++;
+                System.out.println("Turns made: " + turnsMade);
+
+                buttonsEnabled = false;
+                toggleButtons();
+
+                myPoints += values[bNum - 1];
+                System.out.println("My points: " + myPoints);
+            }
+        };
+
+        b1.addActionListener(al);
+        b2.addActionListener(al);
+        b3.addActionListener(al);
+        b4.addActionListener(al);
+    }
+
+    public void toggleButtons() {
+        b1.setEnabled(buttonsEnabled);
+        b2.setEnabled(buttonsEnabled);
+        b3.setEnabled(buttonsEnabled);
+        b4.setEnabled(buttonsEnabled);
     }
 
     // Client Connection Inner Class
@@ -102,6 +140,7 @@ public class Player extends JFrame{
         Player p = new Player(500, 100);
         p.connectToServer();
         p.setUpGUI();
+        p.setUpButtons();
     }
 
 
