@@ -9,10 +9,22 @@ public class GameServer {
     private int numPlayers;
     private ServerSideConnection player1;
     private ServerSideConnection player2;
+    private int turnsMade;
+    private int maxTurns;
+    private int[] values;
 
     public GameServer() {
         System.out.println("*******  G A M E  S E R V E R  *******");
         numPlayers = 0;
+        turnsMade = 0;
+        maxTurns = 4;
+        values = new int[4];
+
+        for(int i = 0; i < values.length; i++) {
+            values[i] = (int) Math.ceil(Math.random() * 100);
+            System.out.println("Value " + (i + 1) + ": " + values[i]);
+        }
+
         try {
             ss = new ServerSocket(30000);
         } catch (IOException ex) {
@@ -62,6 +74,11 @@ public class GameServer {
         public void run() {
             try {
                 dataOut.writeInt(playerID);
+                dataOut.writeInt(maxTurns);
+                dataOut.writeInt(values[0]);
+                dataOut.writeInt(values[1]);
+                dataOut.writeInt(values[2]);
+                dataOut.writeInt(values[3]);
                 dataOut.flush();
 
                 while (true) {

@@ -17,6 +17,11 @@ public class Player extends JFrame{
     private JButton b4;
     private int playerID;
     private int otherPlayerID;
+    private int[] values;
+    private int maxTurns;
+    private int turnsMade;
+    private int myPoints;
+    private int enemyPoints;
     private ClientSideConnection csc;
 
     public Player(int w, int h) {
@@ -28,6 +33,10 @@ public class Player extends JFrame{
         b2 = new JButton("2");
         b3 = new JButton("3");
         b4 = new JButton("4");
+        values = new int[4];
+        turnsMade = 0;
+        myPoints = 0;
+        enemyPoints = 0;
     }
 
     public void setUpGUI() {
@@ -73,6 +82,16 @@ public class Player extends JFrame{
                 dataOut = new DataOutputStream(socket.getOutputStream());
                 playerID = dataIn.readInt();
                 System.out.println("Connected in server as Player " + playerID);
+                maxTurns = dataIn.readInt() / 2;
+                values[0] = dataIn.readInt();
+                values[1] = dataIn.readInt();
+                values[2] = dataIn.readInt();
+                values[3] = dataIn.readInt();
+                System.out.println("Max turns: " + maxTurns);
+                System.out.println("Value 1: " + values[0]);
+                System.out.println("Value 2: " + values[1]);
+                System.out.println("Value 3: " + values[2]);
+                System.out.println("Value 4: " + values[3]);
             } catch (IOException ex) {
                 System.out.println("Error in CSC method");
             }
