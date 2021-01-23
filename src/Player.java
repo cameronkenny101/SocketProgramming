@@ -1,5 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 
 public class Player extends JFrame{
 
@@ -11,6 +15,9 @@ public class Player extends JFrame{
     private JButton b2;
     private JButton b3;
     private JButton b4;
+    private int playerID;
+    private int otherPlayerID;
+    private ClientSideConnection csc;
 
     public Player(int w, int h) {
         width = w;
@@ -25,7 +32,7 @@ public class Player extends JFrame{
 
     public void setUpGUI() {
         this.setSize(width, height);
-        this.setTitle("Turn-Based Game");
+        this.setTitle("Player: " + playerID + " Turn-Based Game");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         contentPane.setLayout(new GridLayout(1, 5));
         contentPane.add(message);
@@ -37,11 +44,44 @@ public class Player extends JFrame{
         contentPane.add(b2);
         contentPane.add(b3);
         contentPane.add(b4);
+
+        if(playerID == 1) {
+            message.setText("You are player #1. You go first");
+            otherPlayerID = 2;
+        } else {
+            message.setText("You are player #2. Wait your turn");
+            otherPlayerID = 1;
+        }
         this.setVisible(true);
+    }
+
+    public void connectToServer() {
+        csc = new ClientSideConnection();
+    }
+
+    // Client Connection Inner Class
+    private class ClientSideConnection {
+        private Socket socket;
+        private DataInputStream dataIn;
+        private DataOutputStream dataOut;
+
+        public ClientSideConnection() {
+            System.out.println("****  C L I E N T   ****");
+            try {
+                socket = new Socket("localhost", 30000);
+                dataIn = new DataInputStream(socket.getInputStream());
+                dataOut = new DataOutputStream(socket.getOutputStream());
+                playerID = dataIn.readInt();
+                System.out.println("Connected in server as Player " + playerID);
+            } catch (IOException ex) {
+                System.out.println("Error in CSC method");
+            }
+        }
     }
 
     public static void main(String[] args) {
         Player p = new Player(500, 100);
+        p.connectToServer();
         p.setUpGUI();
     }
 
