@@ -29,14 +29,20 @@ public class Player extends JFrame{
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         contentPane.setLayout(new GridLayout(1, 5));
         contentPane.add(message);
-        message.setText("Simple turn based game in Java");
+        message.setText("A simple turn based game created in Java");
         message.setWrapStyleWord(true);
+        message.setLineWrap(true);
         message.setEditable(false);
         contentPane.add(b1);
         contentPane.add(b2);
         contentPane.add(b3);
         contentPane.add(b4);
-        this.setVisible(false);
+        this.setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        Player p = new Player(500, 100);
+        p.setUpGUI();
     }
 
 
