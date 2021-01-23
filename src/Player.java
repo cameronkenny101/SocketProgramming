@@ -36,8 +36,8 @@ public class Player extends JFrame{
         contentPane.add(b2);
         contentPane.add(b3);
         contentPane.add(b4);
-        this.setVisible(true);
+        this.setVisible(false);
     }
 
-    
+
 }
