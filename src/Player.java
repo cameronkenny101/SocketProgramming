@@ -65,6 +65,13 @@ public class Player extends JFrame{
             message.setText("You are player #2. Wait your turn");
             otherPlayerID = 1;
             buttonsEnabled = false;
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    updateTurn();
+                }
+            });
+            t.start();
         }
 
         toggleButtons();
@@ -90,6 +97,15 @@ public class Player extends JFrame{
 
                 myPoints += values[bNum - 1];
                 System.out.println("My points: " + myPoints);
+                csc.sendButtonNum(bNum);
+
+                Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateTurn();
+                    }
+                });
+                t.start();
             }
         };
 
@@ -104,6 +120,15 @@ public class Player extends JFrame{
         b2.setEnabled(buttonsEnabled);
         b3.setEnabled(buttonsEnabled);
         b4.setEnabled(buttonsEnabled);
+    }
+
+    public void updateTurn() {
+        int n = csc.receiveButtonNum();
+        message.setText("Your enemy clicked button number: " + n + ". It is now your turn");
+        enemyPoints += values[n - 1];
+        System.out.println("Your enemy has " + enemyPoints + " points");
+        buttonsEnabled = true;
+        toggleButtons();
     }
 
     // Client Connection Inner Class
@@ -133,6 +158,26 @@ public class Player extends JFrame{
             } catch (IOException ex) {
                 System.out.println("Error in CSC method");
             }
+        }
+
+        public void sendButtonNum(int n) {
+            try {
+                dataOut.writeInt(n);
+                dataOut.flush();
+            } catch (IOException ex) {
+                System.out.println("Error in s");
+            }
+        }
+
+        public int receiveButtonNum() {
+            int n = -1;
+            try {
+                n = dataIn.readInt();
+                System.out.println("Player " + otherPlayerID + ": Clicked button " + n);
+            } catch (IOException ex) {
+                System.out.println("Error in receive button method");
+            }
+            return n;
         }
     }
 
