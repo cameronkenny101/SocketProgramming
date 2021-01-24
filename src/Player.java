@@ -99,13 +99,17 @@ public class Player extends JFrame{
                 System.out.println("My points: " + myPoints);
                 csc.sendButtonNum(bNum);
 
-                Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateTurn();
-                    }
-                });
-                t.start();
+                if(playerID == 2 && turnsMade == maxTurns) {
+                    checkWinner();
+                } else {
+                    Thread t = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            updateTurn();
+                        }
+                    });
+                    t.start();
+                }
             }
         };
 
@@ -127,8 +131,23 @@ public class Player extends JFrame{
         message.setText("Your enemy clicked button number: " + n + ". It is now your turn");
         enemyPoints += values[n - 1];
         System.out.println("Your enemy has " + enemyPoints + " points");
-        buttonsEnabled = true;
+        if(playerID == 1 && turnsMade == maxTurns) {
+            checkWinner();
+        } else {
+            buttonsEnabled = true;
+        }
         toggleButtons();
+    }
+
+    private void checkWinner() {
+        buttonsEnabled = false;
+        if(myPoints > enemyPoints) {
+            message.setText(" You WON! \n YOU:" + myPoints + "\n ENEMY:" + enemyPoints);
+        } else if(myPoints < enemyPoints) {
+            message.setText(" You LOST! \n YOU:" + myPoints + "\n ENEMY:" + enemyPoints);
+        } else {
+            message.setText(" You DREW! \n YOU:" + myPoints + "\n ENEMY:" + enemyPoints);
+        }
     }
 
     // Client Connection Inner Class

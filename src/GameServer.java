@@ -93,6 +93,11 @@ public class GameServer {
                         System.out.println("Player 2 clicked button num: " + player2ButtonNum);
                         player1.sendButtonNum(player2ButtonNum);
                     }
+                    turnsMade++;
+                    if(turnsMade == maxTurns) {
+                        System.out.println("Max turns made");
+                        break;
+                    }
                 }
 
             } catch (IOException ex) {
