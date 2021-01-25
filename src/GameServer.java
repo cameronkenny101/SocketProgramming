@@ -46,6 +46,7 @@ public class GameServer {
                     player1 = ssc;
                 } else {
                     player2 = ssc;
+                    player1.sendGame();
                 }
                 Thread t = new Thread(ssc);
                 t.start();
@@ -83,6 +84,8 @@ public class GameServer {
                 dataOut.writeInt(values[3]);
                 dataOut.flush();
 
+
+
                 while (true) {
                     if(playerID == 1) {
                         player1ButtonNum = dataIn.readInt();
@@ -100,8 +103,12 @@ public class GameServer {
                     }
                 }
 
+                player1.closeConnection();
+                player2.closeConnection();
+
             } catch (IOException ex) {
                 System.out.println("Error in run method in SSC");
+                ex.printStackTrace(System.err);
             }
         }
 
@@ -113,6 +120,25 @@ public class GameServer {
                 System.out.println("Error in sendButtonNum method");
             }
 
+        }
+
+        public void sendGame() {
+            try {
+                System.out.println("Sending game");
+                dataOut.writeBoolean(true);
+                dataOut.flush();
+            } catch (IOException ex) {
+                System.out.println("Error in send game method");
+            }
+        }
+
+        public void closeConnection() {
+            try {
+                System.out.println("****   C O N N E C T I O N   C L O S E D   ****");
+                socket.close();
+            } catch (IOException ex) {
+                System.out.println("Error in close connection method");
+            }
         }
 
     }

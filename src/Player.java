@@ -58,9 +58,17 @@ public class Player extends JFrame{
         contentPane.add(b4);
 
         if(playerID == 1) {
-            message.setText("You are player #1. You go first");
+            message.setText("You are player #1. Waiting for player 2");
             otherPlayerID = 2;
-            buttonsEnabled = true;
+            buttonsEnabled = false;
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    startGame();
+                }
+            });
+            t.start();
+
         } else {
             message.setText("You are player #2. Wait your turn");
             otherPlayerID = 1;
@@ -126,6 +134,13 @@ public class Player extends JFrame{
         b4.setEnabled(buttonsEnabled);
     }
 
+    public void startGame() {
+        boolean start = csc.receiveGameStatus();
+        message.setText("Player 2 has joined");
+        buttonsEnabled = true;
+        toggleButtons();
+    }
+
     public void updateTurn() {
         int n = csc.receiveButtonNum();
         message.setText("Your enemy clicked button number: " + n + ". It is now your turn");
@@ -148,6 +163,8 @@ public class Player extends JFrame{
         } else {
             message.setText(" You DREW! \n YOU:" + myPoints + "\n ENEMY:" + enemyPoints);
         }
+
+        csc.closeConnection();
     }
 
     // Client Connection Inner Class
@@ -159,7 +176,7 @@ public class Player extends JFrame{
         public ClientSideConnection() {
             System.out.println("****  C L I E N T   ****");
             try {
-                socket = new Socket("localhost", 30000);
+                socket = new Socket("ec2-34-253-76-28.eu-west-1.compute.amazonaws.com", 30000);
                 dataIn = new DataInputStream(socket.getInputStream());
                 dataOut = new DataOutputStream(socket.getOutputStream());
                 playerID = dataIn.readInt();
@@ -184,8 +201,19 @@ public class Player extends JFrame{
                 dataOut.writeInt(n);
                 dataOut.flush();
             } catch (IOException ex) {
-                System.out.println("Error in s");
+                System.out.println("Error in send button number method");
             }
+        }
+
+        public boolean receiveGameStatus() {
+            boolean status = false;
+            System.out.println("Receiving game");
+            try {
+                status = dataIn.readBoolean();
+            } catch (IOException ex) {
+                System.out.println("Error in receive status method");
+            }
+            return status;
         }
 
         public int receiveButtonNum() {
@@ -197,6 +225,15 @@ public class Player extends JFrame{
                 System.out.println("Error in receive button method");
             }
             return n;
+        }
+
+        public void closeConnection() {
+            try {
+                socket.close();
+                System.out.println("****   C O N N E C T I O N   C L O S E D   ****");
+            } catch (IOException ex) {
+                System.out.println("Error in close connection method");
+            }
         }
     }
 
